@@ -7,6 +7,15 @@
   "scripts": {
     "parc": "node scripts/demarrer.mjs parc",
     "locations": "node scripts/demarrer.mjs locations",
-    "frontend": "cd frontend && npm start"
+    "frontend": "cd frontend && npm start",
+    "agent": "node resources/telecharger-agent.mjs",
+    "observabilite": "docker compose -f observabilite/docker-compose.yml up -d",
+    "parc:agent": "node scripts/demarrer-observe.mjs parc",
+    "locations:agent": "node scripts/demarrer-observe.mjs locations",
+    "scenarios": "node resources/scenarios.mjs",
+    "scenarios:sup": "node scripts/scenarios-supplementaires.mjs",
+    "bilan:q3": "node scripts/bilan-q3.mjs",
+    "verifier": "node resources/verifier-fonctionnel.mjs",
+    "sentinelle": "node resources/verifier-confidentialite.mjs --journaux journaux"
   }
 }
