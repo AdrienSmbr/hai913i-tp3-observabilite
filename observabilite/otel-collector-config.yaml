@@ -1,0 +1,50 @@
+# TP3, OpenTelemetry Collector de velos-tp3.
+#
+# Recevoir, traiter, exporter. Trois sources (deux agents Java, un navigateur),
+# un seul backend (Jaeger). Rien ne parle à Jaeger sans passer par ici.
+
+receivers:
+  otlp:
+    protocols:
+      # Les deux services Java : l'agent exporte en OTLP/gRPC par défaut.
+      grpc:
+        endpoint: 0.0.0.0:4317
+      # Le navigateur : OTLP/HTTP en JSON. Ce type de contenu n'est pas « sûr »
+      # au sens CORS, donc une requête OPTIONS précède chaque envoi et le
+      # Collector doit y répondre pour l'origine de l'interface.
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          # Origine explicite, jamais « * ».
+          allowed_origins:
+            - http://localhost:4200
+          max_age: 7200
+
+processors:
+  # Un seul traitement : regrouper les spans en lots avant l'export. On
+  # n'ajoute pas de processeur sans raison.
+  batch:
+    timeout: 1s
+
+exporters:
+  # Vers Jaeger, en OTLP natif. « otlp_grpc » est le nom actuel du type.
+  # « otlp » seul est un alias déprécié.
+  otlp_grpc/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Diagnostic : un résumé de ce qui entre, visible avec
+  # `docker compose -f observabilite/docker-compose.yml logs -f collector`.
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_grpc/jaeger, debug]
+  telemetry:
+    logs:
+      level: info

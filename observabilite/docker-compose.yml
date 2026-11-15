@@ -1,0 +1,37 @@
+# TP3, infrastructure d'observabilité de velos-tp3.
+#
+# Seuls le Collector et Jaeger sont conteneurisés. Les deux services Java et
+# l'interface web se lancent localement : on veut voir l'agent s'attacher à
+# une JVM que l'on démarre soi-même, et pouvoir relancer l'application sans
+# toucher à l'infrastructure.
+#
+# Versions ÉPINGLÉES (exigence du sujet) : jamais « latest ».
+#
+#     docker compose -f observabilite/docker-compose.yml up -d
+#     docker compose -f observabilite/docker-compose.yml logs -f collector
+#     docker compose -f observabilite/docker-compose.yml down
+
+name: velos-observabilite
+
+services:
+  collector:
+    image: otel/opentelemetry-collector:0.162.0
+    container_name: velos-collector
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel/config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP/gRPC : les agents Java de parc et de locations
+      - "4318:4318"   # OTLP/HTTP : le navigateur (avec CORS)
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/jaeger:2.22.0
+    container_name: velos-jaeger
+    ports:
+      - "16686:16686"   # interface web et API de requête
+    # Les ports OTLP de Jaeger ne sont PAS publiés sur l'hôte : rien ne lui
+    # parle directement, tout passe par le Collector.
+    expose:
+      - "4317"
