@@ -41,9 +41,9 @@ Trois processus coopèrent :
 
 | Processus   | Port | Rôle                                                                                            |
 | ----------- | ---- | ----------------------------------------------------------------------------------------------- |
-| `frontend`  | 4200 | l'interface web (Angular) ; elle ne parle qu'au service des locations                           |
-| `locations` | 8080 | le registre des locations, l'abonnement, la facturation ; **seul point d'entrée** du navigateur |
-| `parc`      | 8081 | les stations et les vélos ; appelé **uniquement** par `locations`                               |
+| `frontend`  | 4200 | l'interface web (Angular), elle ne parle qu'au service des locations                           |
+| `locations` | 8080 | le registre des locations, l'abonnement, la facturation, **seul point d'entrée** du navigateur |
+| `parc`      | 8081 | les stations et les vélos, appelé **uniquement** par `locations`                               |
 
 ```
 navigateur  ──►  locations  ──►  parc  ──►  H2
@@ -72,7 +72,7 @@ configuration/ le câblage : horloge, client HTTP, CORS, données de départ.
 ```
 
 Le service des locations a une couche `parc/` de plus définissant le **port** vers l'autre service.
-`ParcDistant` est une interface ; `ClientParcHttp` en est la seule implémentation.
+`ParcDistant` est une interface, et `ClientParcHttp` en est la seule implémentation.
 C'est pour cette raison que `ServiceLocationsTest` s'exécute sans Spring, sans base et sans réseau.
 
 Le frontal suit la même discipline :
@@ -93,13 +93,13 @@ parc/*-list, parc-page  l'affichage ; aucun composant n'appelle l'API
 L'application **n'émet aucune télémétrie applicative** :
 
 - pas une seule ligne de journalisation, dans aucune des deux applications
-  dorsales ni dans le frontal ;
-- aucun span écrit à la main, aucune annotation d'instrumentation ;
+  dorsales ni dans le frontal,
+- aucun span écrit à la main, aucune annotation d'instrumentation,
 - aucune dépendance OpenTelemetry dans les `pom.xml` ni dans le
-  `package.json` ;
+  `package.json`,
 - aucun Collector, aucun Jaeger, aucun `docker-compose.yml`.
 
-Lancez les services et exercez-les ; vous verrez que la sortie reste vide.
+Lancez les services et exercez-les : vous verrez que la sortie reste vide.
 C'est le point de départ du TP.
 
 **Décider où observer, quoi émettre et comment, c'est le travail demandé.**
@@ -168,7 +168,7 @@ Sous macOS, Linux et Git Bash, `sh scripts/demarrer.sh parc` fait la même chose
 
 ## 7. Exercer l'application
 
-Les scénarios et les contrôles viennent de la ressource **« TP3 — Scénarios et données de validation »** ; une fois `resources.zip` extraite (voir §0), ils sont dans `resources/`, et tout se lance depuis la racine :
+Les scénarios et les contrôles viennent de la ressource **« TP3 — Scénarios et données de validation »**. Une fois `resources.zip` extraite (voir §0), ils sont dans `resources/`, et tout se lance depuis la racine :
 
 ```
 node resources/scenarios.mjs              les sept scenarios, et leurs durées
@@ -224,7 +224,7 @@ Caused by: Error: [vitest-pool-runner]: Timeout waiting for worker to respond
 Ce n'est pas vos tests qui échouent, mais c'est plutôt le **lanceur** (*runner*) qui n'arrive même pas à démarrer.
 Lors du premier lancement, `ng test` build l'application (environ 20 secondes), puis Vitest tente d'ouvrir un processus par fichier de test.
 Comme le dossier `node_modules` vient d'être écrit, votre antivirus est souvent en train de l'analyser, ce qui ralentit considérablement l'opération.
-Vitest finit par abandonner au bout de 60 secondes ; il s'agit d'une limite fixe du paquet qu'aucune option de configuration ne permet de modifier.
+Vitest finit par abandonner au bout de 60 secondes. Il s'agit d'une limite fixe du paquet qu'aucune option de configuration ne permet de modifier.
 
 **Relancez simplement `npm test`.**
 La deuxième exécution profitera d'un cache chaud et se terminera en quelques secondes.
@@ -255,7 +255,7 @@ Les symptômes sont alors déroutants et sans rapport apparent avec la cause.
 Les deux services dorsaux doivent écouter **avant** que la page ne charge.
 L'interface distingue et affiche trois catégories d'échec : `injoignable` (personne n'a répondu), `refus-du-service` (le service a
 répondu, et il a dit non) et `inattendu`.
-La première se corrige en démarrant le service ; la deuxième se lit dans le message.
+La première se corrige en démarrant le service, la deuxième se lit dans le message.
 
 ---
 
@@ -278,5 +278,5 @@ velos-tp3/
 `-- .gitignore
 ```
 
-`resources/` et `examples/` viennent des deux autres archives (voir §0) ;
+`resources/` et `examples/` viennent des deux autres archives (voir §0),
 `starter.zip` ne les contient pas.
