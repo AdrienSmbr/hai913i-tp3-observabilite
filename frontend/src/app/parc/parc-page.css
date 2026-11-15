@@ -40,3 +40,9 @@ h2 {
 code {
   color: var(--marine-clair);
 }
+
+/* TP3 : l'identifiant de trace du dernier geste, à coller dans Jaeger. */
+.trace {
+  font-size: 0.85em;
+  color: #555;
+}

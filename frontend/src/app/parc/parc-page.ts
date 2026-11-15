@@ -28,6 +28,8 @@ export class ParcPage implements OnInit {
   readonly rapport = this.store.rapport;
   readonly resultat = this.store.resultat;
   readonly enCours = this.store.enCours;
+  /** TP3 : identifiant de trace du dernier geste. */
+  readonly trace = this.store.trace;
 
   ngOnInit(): void {
     void this.store.rafraichir();

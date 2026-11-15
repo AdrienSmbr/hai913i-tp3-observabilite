@@ -19,6 +19,9 @@
     — {{ r.echec.message }}
   </p>
 }
+@if (trace()) {
+  <p class="trace">trace du dernier geste : <code>{{ trace() }}</code></p>
+}
 
 <h2>Stations</h2>
 <app-station-list
