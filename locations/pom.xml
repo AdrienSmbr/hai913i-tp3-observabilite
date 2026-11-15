@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  TP 3 — projet de démarrage, service « locations ».
+  TP 3, projet de démarrage, service « locations ».
 
   C'est le seul service que l'interface web appelle.
   Il tient le registre des locations et s'adresse au service « parc »
@@ -26,7 +26,23 @@
   <properties>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- TP3 : versions OpenTelemetry alignées sur l'agent Java 2.32.0. -->
+    <otel.version>1.66.0</otel.version>
+    <otel.instrumentation.version>2.32.0</otel.instrumentation.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Aligne toutes les bibliothèques OpenTelemetry sur une même version. -->
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-bom</artifactId>
+        <version>${otel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -47,9 +63,31 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!--
+      TP3 : API OpenTelemetry, pour l'instrumentation MANUELLE seulement
+      (span explicite et annotation @WithSpan). L'instrumentation zéro-code
+      est apportée par l'agent, sans dépendance. Sans agent, ces appels sont
+      des no-op et le service se comporte à l'identique.
+    -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+      <version>${otel.instrumentation.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- TP3 : SDK et exportateur en mémoire, pour tester les spans manuels. -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-testing</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

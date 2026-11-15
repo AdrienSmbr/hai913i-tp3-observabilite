@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  TP 3 — projet de démarrage, service « parc ».
+  TP 3, projet de démarrage, service « parc ».
 
   Ce service connaît les stations et les vélos.
   Il est appelé par le service « locations », mais jamais par le navigateur.
@@ -28,7 +28,23 @@
   <properties>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- TP3 : versions OpenTelemetry alignées sur l'agent Java 2.32.0. -->
+    <otel.version>1.66.0</otel.version>
+    <otel.instrumentation.version>2.32.0</otel.instrumentation.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Aligne toutes les bibliothèques OpenTelemetry sur une même version. -->
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-bom</artifactId>
+        <version>${otel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -54,6 +70,22 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
+    </dependency>
+
+    <!--
+      TP3 : API OpenTelemetry, pour l'instrumentation MANUELLE seulement
+      (span explicite et annotation @WithSpan). L'instrumentation zéro-code
+      est apportée par l'agent, sans dépendance. Sans agent, ces appels sont
+      des no-op et le service se comporte à l'identique.
+    -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+      <version>${otel.instrumentation.version}</version>
     </dependency>
 
     <dependency>
