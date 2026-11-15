@@ -1,0 +1,12 @@
+service    tracer (bibliotheque)                               spans  exemples
+locations  hai913i.tp3.locations                                   1  location.restituer
+locations  io.opentelemetry.hibernate-6.0                          5  Session.find, Session.merge, Transaction.commit
+locations  io.opentelemetry.java-http-client                       1  POST
+locations  io.opentelemetry.jdbc                                   3  SELECT locations.location, UPDATE locations.location
+locations  io.opentelemetry.spring-data-1.8                        3  LocationJpa.findById, LocationJpa.save
+locations  io.opentelemetry.tomcat-10.0                            1  POST /locations/{reference}/restitution
+parc       io.opentelemetry.hibernate-6.0                          8  SELECT, Session.find, Transaction.commit
+parc       io.opentelemetry.jdbc                                   6  SELECT parc.station, SELECT parc.velo, UPDATE parc.velo
+parc       io.opentelemetry.spring-data-1.8                        5  StationJpa.findById, VeloJpa.countByCodeStation, VeloJpa.countByCodeStationAndEtat, VeloJpa.findById
+parc       io.opentelemetry.tomcat-10.0                            1  POST /stations/{code}/depot
+total 34 - dont manuels : 1

@@ -1,0 +1,12 @@
+service         span                              kind  spanId            parentSpanId      parent (service)
+velos-frontend  POST                              3     a981297a43dd5a39  650b0f63c398c0ee  geste.louer (velos-frontend)
+velos-frontend  geste.louer                       1     650b0f63c398c0ee                    -
+locations       POST /locations                   2     4e40afebf1a0bf57  a981297a43dd5a39  POST (velos-frontend)
+locations       location.ouvrir                   1     ab06c905ccace663  4e40afebf1a0bf57  POST /locations (locations)
+locations       POST                              3     44cb320d99f5ef1e  ab06c905ccace663  location.ouvrir (locations)
+parc            POST /stations/{code}/retrait     2     ef330f10565c801a  44cb320d99f5ef1e  POST (locations)
+parc            parc.retirer_velo                 1     d744b949dd12f6a2  ef330f10565c801a  POST /stations/{code}/retrait (parc)
+parc            StationJpa.findById               1     bdbedc7f19b67134  d744b949dd12f6a2  parc.retirer_velo (parc)
+parc            Session.find hai913i.tp3.parc.dep 1     1ef6a373ec0530c4  bdbedc7f19b67134  StationJpa.findById (parc)
+parc            SELECT parc.station               3     c93424a9978db29b  1ef6a373ec0530c4  Session.find hai913i.tp3.parc.depot.jpa.StationEntite (parc)
+parc            Transaction.commit                1     1d2003684a52a38b  bdbedc7f19b67134  StationJpa.findById (parc)

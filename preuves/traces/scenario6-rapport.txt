@@ -1,0 +1,25 @@
+
+trace 3c4246185a604959219bdfd10cf8e236   19 span(s)
+--------------------------------------------------------------------------------------------
+GET /locations/{reference}/rapport              628.1 ms  100 %  ####################  locations
+  LocationJpa.findById                            2.3 ms    0 %  #...................  locations
+    Session.find hai913i.tp3.locations.depot      1.2 ms    0 %  #...................  locations
+      SELECT locations.location                   0.1 ms    0 %  #...................  locations
+    Transaction.commit                            0.1 ms    0 %  #...................  locations
+  GET                                           526.4 ms   84 %  #################...  locations
+    GET /stations/{code}/indice-rotation        524.4 ms   83 %  #################...  parc
+      parc.indice_rotation                      519.7 ms   83 %  #################...  parc
+        StationJpa.findById                       0.8 ms    0 %  #...................  parc
+          Session.find hai913i.tp3.parc.depo      0.4 ms    0 %  #...................  parc
+            SELECT parc.station                   0.1 ms    0 %  #...................  parc
+          Transaction.commit                      0.1 ms    0 %  #...................  parc
+        VeloJpa.findByCodeStationOrderByIden      2.2 ms    0 %  #...................  parc
+          SELECT hai913i.tp3.parc.depot.jpa.      1.1 ms    0 %  #...................  parc
+            SELECT parc.velo                      0.1 ms    0 %  #...................  parc
+        parc.consolidation                      505.1 ms   80 %  ################....  parc
+  LocationJpa.countByCodeDepart                  91.9 ms   15 %  ###.................  locations
+    SELECT hai913i.tp3.locations.depot.jpa.L     11.2 ms    2 %  #...................  locations
+      SELECT locations.location                   1.4 ms    0 %  #...................  locations
+--------------------------------------------------------------------------------------------
+services traverses : parc, locations
+tracers : io.opentelemetry.jdbc | io.opentelemetry.tomcat-10.0 | io.opentelemetry.hibernate-6.0 | io.opentelemetry.opentelemetry-instrumentation-annotations-1.16 | io.opentelemetry.spring-data-1.8 | hai913i.tp3.parc | io.opentelemetry.java-http-client

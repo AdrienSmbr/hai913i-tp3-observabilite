@@ -1,0 +1,8 @@
+scenario                    statut   duree  but d observation
+----------------------------------------------------------------------------------------------------
+S8. station inconnue        404        28 ms  le 4e echec de Q2 (404) : refus venu du PARC, motif station_inconnue
+                                           ou regarder : parc.log parc.retrait_refuse ; span parc.retirer_velo en ERROR
+S9. double restitution      409        31 ms  un echec 409 entierement LOCAL : la trace du 2e rendu n a aucun span parc
+                                           ou regarder : locations.log location.restitution_echouee etape=recherche_location
+S10. activite pour Q3       200        40 ms  deux ouvertures a deux autres stations et leurs clotures : de quoi compter
+                                           ou regarder : locations.log location.ouverte / location.cloturee ; node scripts/bilan-q3.mjs

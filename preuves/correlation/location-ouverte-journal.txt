@@ -1,0 +1,3 @@
+trace ff47f1fa7290ed03debbf4cf9ec3ff96 : 1 ligne(s) de journaux/locations.log
+--------------------------------------------------------------------------------------------
+   14 | {"@timestamp":"2026-11-10T10:02:25.896965Z","log":{"level":"INFO","logger":"hai913i.tp3.locations.service.ServiceLocations"},"process":{"pid":82220,"thread":{"name":"http-nio-8080-exec-7"}},"service":{"name":"locations","version":"1.0.0","node":{}},"message":"location.ouverte","trace_id":"ff47f1fa7290ed03debbf4cf9ec3ff96","trace_flags":"01","span_id":"943afce26206ecc3","location":{"reference":"L-0005"},"station":{"depart":"ST-COMEDIE"},"velo":{"identifiant":"V-0001"},"abonne":{"domaine":"etu.umontpellier.fr"},"ecs":{"version":"8.11"}}

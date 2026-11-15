@@ -1,0 +1,12 @@
+scénario                        statut    durée  but d'observation
+------------------------------------------------------------------------------------------------
+1. parcours nominal             200          10 ms  le cas qui marche, de bout en bout
+2. ouverture de location        201         450 ms  un jalon métier que personne ne devine
+3. station sans vélo            409          42 ms  un refus, et non une panne
+4. station hors service         503          10 ms  un échec provoqué par L'AUTRE service
+5. abonné refusé                401           3 ms  un secret envoyé pour de bon
+6. rapport d'exploitation       200         630 ms  l'opération lente : où passe le temps ?
+7. restitution                  200         123 ms  la clôture, sa durée et son montant
+
+le scénario le plus long est « 6. rapport d'exploitation » : 630 ms.
+Rien ici ne dit POURQUOI. C'est la question du TP.

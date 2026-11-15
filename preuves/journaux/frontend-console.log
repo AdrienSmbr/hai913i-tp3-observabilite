@@ -1,0 +1,5 @@
+{"niveau":"INFO","service":"velos-frontend","message":"geste.termine","geste":"geste.rafraichir","duree_ms":78,"trace_id":"39ed1feee6209a3c00cc4a3e7a5b62ac"}
+{"niveau":"INFO","service":"velos-frontend","message":"geste.termine","geste":"geste.louer","station.code":"ST-COMEDIE","duree_ms":41,"trace_id":"ff47f1fa7290ed03debbf4cf9ec3ff96"}
+{"niveau":"INFO","service":"velos-frontend","message":"geste.termine","geste":"geste.voir_rapport","location.reference":"L-0005","duree_ms":544,"trace_id":"4f8b14cf407bbfdbf49debc910ae2684"}
+{"niveau":"INFO","service":"velos-frontend","message":"geste.termine","geste":"geste.rendre","location.reference":"L-0005","station.arrivee":"ST-ARCEAUX","duree_ms":84,"trace_id":"172df065fbb18f99dfe22b42e9b99761"}
+{"niveau":"WARN","service":"velos-frontend","message":"geste.echoue","geste":"geste.louer","station.code":"ST-PEYROU","duree_ms":19,"echec.categorie":"refus-du-service","echec.statut_http":503,"trace_id":"4be973674a1c73a6b41661b8129b0e0c"}

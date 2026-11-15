@@ -1,0 +1,9 @@
+
+trace 4e3a1363ac9bce0c23e85b1f7e378372   3 span(s)
+--------------------------------------------------------------------------------------------
+POST /locations                                  28.2 ms  100 %  ####################  locations  ERREUR
+  location.ouvrir                                19.6 ms   70 %  ##############......  locations  ERREUR
+    POST                                          9.2 ms   33 %  #######.............  locations  ERREUR
+--------------------------------------------------------------------------------------------
+services traverses : locations
+tracers : hai913i.tp3.locations | io.opentelemetry.tomcat-10.0 | io.opentelemetry.java-http-client

@@ -1,0 +1,9 @@
+velos-frontend  POST                              3     850efd617c17387a  5313f6848dc8af54  geste.louer (velos-frontend)
+velos-frontend  geste.louer                       1     5313f6848dc8af54                    -
+locations       POST /locations                   2     b00348542254c586  850efd617c17387a  POST (velos-frontend)
+locations       location.ouvrir                   1     943afce26206ecc3  b00348542254c586  POST /locations (locations)
+locations       POST                              3     97fb82244c81fa5b  943afce26206ecc3  location.ouvrir (locations)
+parc            POST /stations/{code}/retrait     2     980829cd1b2ce661  97fb82244c81fa5b  POST (locations)
+parc            parc.retirer_velo                 1     9b947139e9d5f4c8  980829cd1b2ce661  POST /stations/{code}/retrait (parc)
+velos-frontend  GET                               3     e2a4347580182e85  5313f6848dc8af54  geste.louer (velos-frontend)
+velos-frontend  GET                               3     b081728d2ef74df8  5313f6848dc8af54  geste.louer (velos-frontend)

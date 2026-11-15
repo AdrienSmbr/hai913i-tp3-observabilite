@@ -1,0 +1,4 @@
+scenario                    statut   duree  but d observation
+----------------------------------------------------------------------------------------------------
+S11. parc injoignable       503        39 ms  une panne, pas un refus : 503 sans reponse du parc, cause ConnectException
+                                           ou regarder : locations.log ERROR avec pile ; span CLIENT en erreur, 1 seul service dorsal

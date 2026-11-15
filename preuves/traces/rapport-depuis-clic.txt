@@ -1,0 +1,27 @@
+
+trace 4f8b14cf407bbfdbf49debc910ae2684   21 span(s)
+--------------------------------------------------------------------------------------------
+geste.voir_rapport                              543.7 ms  100 %  ####################  velos-frontend
+  GET                                           542.7 ms  100 %  ####################  velos-frontend
+    GET /locations/{reference}/rapport          528.3 ms   97 %  ###################.  locations
+      LocationJpa.findById                        5.1 ms    1 %  #...................  locations
+        Session.find hai913i.tp3.locations.d      2.5 ms    0 %  #...................  locations
+          SELECT locations.location               0.5 ms    0 %  #...................  locations
+        Transaction.commit                        0.2 ms    0 %  #...................  locations
+      GET                                       512.4 ms   94 %  ###################.  locations
+        GET /stations/{code}/indice-rotation    508.9 ms   94 %  ###################.  parc
+          parc.indice_rotation                  505.5 ms   93 %  ###################.  parc
+            StationJpa.findById                   2.5 ms    0 %  #...................  parc
+              Session.find hai913i.tp3.parc.      1.5 ms    0 %  #...................  parc
+                SELECT parc.station               0.2 ms    0 %  #...................  parc
+              Transaction.commit                  0.2 ms    0 %  #...................  parc
+            VeloJpa.findByCodeStationOrderBy      1.8 ms    0 %  #...................  parc
+              SELECT hai913i.tp3.parc.depot.      1.1 ms    0 %  #...................  parc
+                SELECT parc.velo                  0.2 ms    0 %  #...................  parc
+            parc.consolidation                  500.6 ms   92 %  ##################..  parc
+      LocationJpa.countByCodeDepart               4.8 ms    1 %  #...................  locations
+        SELECT hai913i.tp3.locations.depot.j      2.3 ms    0 %  #...................  locations
+          SELECT locations.location               0.9 ms    0 %  #...................  locations
+--------------------------------------------------------------------------------------------
+services traverses : parc, velos-frontend, locations
+tracers : io.opentelemetry.jdbc | io.opentelemetry.tomcat-10.0 | io.opentelemetry.hibernate-6.0 | io.opentelemetry.opentelemetry-instrumentation-annotations-1.16 | io.opentelemetry.spring-data-1.8 | hai913i.tp3.parc | @opentelemetry/browser-instrumentation/fetch | velos-frontend | io.opentelemetry.java-http-client

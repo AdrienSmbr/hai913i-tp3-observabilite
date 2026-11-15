@@ -1,0 +1,9 @@
+agent OpenTelemetry : service « parc » -> http://localhost:4317
+demarrage du service « parc » sur le port 8081 — Ctrl-C pour arreter
+arguments JVM supplementaires : -javaagent:/Users/florent/Projets/Loisir/Etudes/M2/Evolution/TP3/velos-tp3/opentelemetry-javaagent.jar -Dotel.service.name=parc -Dotel.exporter.otlp.endpoint=http://localhost:4317 -Dotel.exporter.otlp.protocol=grpc -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[otel.javaagent 2026-11-10 11:01:52:763 +0100] [main] INFO io.opentelemetry.javaagent.tooling.VersionLogger - opentelemetry-javaagent - version: 2.32.0
+11:02:10.940 WARN  [ServiceParc] parc.retrait_refuse station.code="ST-GARE" refus.motif="aucun_velo_disponible" {trace_id=845559ba8b284005575b28fccc9364ec span_id=45a476cfabc4d0d5}
+11:02:10.975 WARN  [ServiceParc] parc.retrait_refuse station.code="ST-PEYROU" refus.motif="station_hors_service" {trace_id=9d98e5752f33e3c9cb14417248e9a974 span_id=293d03a603119c1e}
+11:02:11.883 WARN  [ServiceParc] parc.retrait_refuse station.code="ST-AILLEURS" refus.motif="station_inconnue" {trace_id=3e9120d40607eaaf310863e789edfb5c span_id=b8704e16418566d4}
+11:02:44.675 WARN  [ServiceParc] parc.retrait_refuse station.code="ST-PEYROU" refus.motif="station_hors_service" {trace_id=4be973674a1c73a6b41661b8129b0e0c span_id=d744b949dd12f6a2}

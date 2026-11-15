@@ -1,0 +1,33 @@
+=== 1. le parc de départ ===
+  OK   nombre de stations                                   
+  OK   codes des stations                                   
+  OK   vélos retirables par station                         
+  OK   total des vélos retirables                           
+  OK   stations hors service                                
+
+=== 2. ce que l interface web voit ===
+  OK   nombre de stations vues du frontal                   
+  OK   stations louables                                    
+
+=== 3. ouvrir, consulter, restituer ===
+  OK   ouverture : statut                                   
+  OK   ouverture : référence                                
+  OK   ouverture : vélo retiré                              
+  OK   ouverture : état                                     
+  OK   rapport : statut                                     
+  OK   rapport : indice de rotation                         
+  OK   rapport : locations à cette station                  
+  OK   restitution : statut                                 
+  OK   restitution : durée facturée                         
+  OK   restitution : montant                                
+  OK   restitution : état                                   
+
+=== 4. les refus ===
+  OK   station sans vélo : statut                           
+  OK   station hors service : statut                        
+  OK   station inconnue : statut                            
+  OK   mot de passe faux : statut                           
+  OK   mot de passe faux : le message ne reprend pas le secret 
+  OK   restitution déjà faite : statut                      
+
+OK : le socle fonctionnel est conforme (21 contrôles).

@@ -1,0 +1,103 @@
+agent OpenTelemetry : service « locations » -> http://localhost:4317
+demarrage du service « locations » sur le port 8080 — Ctrl-C pour arreter
+arguments JVM supplementaires : -javaagent:/Users/florent/Projets/Loisir/Etudes/M2/Evolution/TP3/velos-tp3/opentelemetry-javaagent.jar -Dotel.service.name=locations -Dotel.exporter.otlp.endpoint=http://localhost:4317 -Dotel.exporter.otlp.protocol=grpc -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[otel.javaagent 2026-11-10 11:01:59:160 +0100] [main] INFO io.opentelemetry.javaagent.tooling.VersionLogger - opentelemetry-javaagent - version: 2.32.0
+11:02:10.918 INFO  [ServiceLocations] location.ouverte location.reference="L-0001" station.depart="ST-COMEDIE" velo.identifiant="V-0006" abonne.domaine="etu.umontpellier.fr" {trace_id=745ea5edfbfb89ae75e2e629a25ad499 span_id=d6384710518638a9}
+11:02:10.965 WARN  [ServiceLocations] location.ouverture_echouee echec.etape="retrait_parc" echec.cause="MouvementRefuse" station.depart="ST-GARE" {trace_id=845559ba8b284005575b28fccc9364ec span_id=0c0ec795688911a4}
+11:02:10.978 ERROR [ServiceLocations] location.ouverture_echouee echec.etape="retrait_parc" echec.cause="ParcIndisponible" station.depart="ST-PEYROU" {trace_id=9d98e5752f33e3c9cb14417248e9a974 span_id=053792e1391d886c}
+11:02:10.982 WARN  [ServiceLocations] location.ouverture_echouee echec.etape="verification_abonne" echec.cause="AbonneRefuse" station.depart="ST-COMEDIE" {trace_id=fcbd3293149b9e2c1f7f24b7420d9693 span_id=1f14ed533224bc03}
+11:02:11.732 INFO  [ServiceLocations] location.cloturee location.reference="L-0001" station.depart="ST-COMEDIE" station.arrivee="ST-ARCEAUX" location.duree_minutes="1" location.montant_eur="1.05" {trace_id=e9ff6df2f897c79f1b1a4791d3b0bb52 span_id=7f8b80c1579ddc72}
+11:02:11.885 WARN  [ServiceLocations] location.ouverture_echouee echec.etape="retrait_parc" echec.cause="StationInconnue" station.depart="ST-AILLEURS" {trace_id=3e9120d40607eaaf310863e789edfb5c span_id=8032922e9452c06b}
+11:02:11.900 INFO  [ServiceLocations] location.ouverte location.reference="L-0002" station.depart="ST-MOSSON" velo.identifiant="V-0015" abonne.domaine="etu.umontpellier.fr" {trace_id=2467529d905fcb8d03d7be0e674f6889 span_id=c9e2c2b4d0b945f1}
+11:02:11.914 INFO  [ServiceLocations] location.cloturee location.reference="L-0002" station.depart="ST-MOSSON" station.arrivee="ST-TRIOLET" location.duree_minutes="1" location.montant_eur="1.05" {trace_id=349ff8eb10a05d1d31120d61d84a65f8 span_id=ec2288e724f8d4aa}
+11:02:11.919 WARN  [ServiceLocations] location.restitution_echouee echec.etape="recherche_location" echec.cause="LocationDejaCloturee" location.reference="L-0002" {trace_id=4653693693f936f856621fb743c19a33 span_id=00400c8a35333387}
+11:02:11.930 INFO  [ServiceLocations] location.ouverte location.reference="L-0003" station.depart="ST-ARCEAUX" velo.identifiant="V-0001" abonne.domaine="etu.umontpellier.fr" {trace_id=365b3f7cc4f3caba5fc563e3b90cb3f2 span_id=535d6dce7752f6df}
+11:02:11.939 INFO  [ServiceLocations] location.ouverte location.reference="L-0004" station.depart="ST-TRIOLET" velo.identifiant="V-0015" abonne.domaine="etu.umontpellier.fr" {trace_id=a84900cfdc3890b4cc041d6a786decc3 span_id=7955086198b52c49}
+11:02:11.949 INFO  [ServiceLocations] location.cloturee location.reference="L-0003" station.depart="ST-ARCEAUX" station.arrivee="ST-COMEDIE" location.duree_minutes="1" location.montant_eur="1.05" {trace_id=29d680b91e46267e044c0e9af84a6a23 span_id=6cc9b147b25f5fe1}
+11:02:11.960 INFO  [ServiceLocations] location.cloturee location.reference="L-0004" station.depart="ST-TRIOLET" station.arrivee="ST-COMEDIE" location.duree_minutes="1" location.montant_eur="1.05" {trace_id=c02310615a2f73f7ea83ec204b2d97e3 span_id=db1c2843862833ef}
+11:02:25.896 INFO  [ServiceLocations] location.ouverte location.reference="L-0005" station.depart="ST-COMEDIE" velo.identifiant="V-0001" abonne.domaine="etu.umontpellier.fr" {trace_id=ff47f1fa7290ed03debbf4cf9ec3ff96 span_id=943afce26206ecc3}
+11:02:43.498 INFO  [ServiceLocations] location.cloturee location.reference="L-0005" station.depart="ST-COMEDIE" station.arrivee="ST-ARCEAUX" location.duree_minutes="1" location.montant_eur="1.05" {trace_id=172df065fbb18f99dfe22b42e9b99761 span_id=8017c102a954fc5d}
+11:02:44.681 ERROR [ServiceLocations] location.ouverture_echouee echec.etape="retrait_parc" echec.cause="ParcIndisponible" station.depart="ST-PEYROU" {trace_id=4be973674a1c73a6b41661b8129b0e0c span_id=ab06c905ccace663}
+11:03:46.956 ERROR [ServiceLocations] location.ouverture_echouee echec.etape="retrait_parc" echec.cause="ParcIndisponible" station.depart="ST-COMEDIE" {trace_id=4e3a1363ac9bce0c23e85b1f7e378372 span_id=fed5e95131c3d5be}
+hai913i.tp3.locations.parc.ParcIndisponible: service du parc injoignable : http://localhost:8081
+	at hai913i.tp3.locations.parc.ClientParcHttp.injoignable(ClientParcHttp.java:107)
+	at hai913i.tp3.locations.parc.ClientParcHttp.retirer(ClientParcHttp.java:69)
+	at hai913i.tp3.locations.service.ServiceLocations.ouvrir(ServiceLocations.java:137)
+	at hai913i.tp3.locations.api.LocationsController.ouvrir(LocationsController.java:55)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:649)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:132)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:59)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111)
+	at org.springframework.web.servlet.v6_0.OpenTelemetryHandlerMappingFilter.doFilter(OpenTelemetryHandlerMappingFilter.java:78)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:535)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:86)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:71)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:347)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:406)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:71)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1307)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:2036)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:74)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:949)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:483)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:74)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.springframework.web.client.ResourceAccessException: I/O error on POST request for "http://localhost:8081/stations/ST-COMEDIE/retrait": null
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.createResourceAccessException(DefaultRestClient.java:779)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchangeInternal(DefaultRestClient.java:624)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchange(DefaultRestClient.java:572)
+	at org.springframework.web.client.RestClient$RequestHeadersSpec.exchange(RestClient.java:747)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.executeAndExtract(DefaultRestClient.java:924)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.body(DefaultRestClient.java:833)
+	at hai913i.tp3.locations.parc.ClientParcHttp.retirer(ClientParcHttp.java:65)
+	... 49 common frames omitted
+Caused by: java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1107)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:198)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.checkRetryConnect(PlainHttpConnection.java:230)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:206)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	... 1 common frames omitted
+Caused by: java.nio.channels.ClosedChannelException
+	at java.base/sun.nio.ch.SocketChannelImpl.ensureOpen(SocketChannelImpl.java:195)
+	at java.base/sun.nio.ch.SocketChannelImpl.beginConnect(SocketChannelImpl.java:760)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:848)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$0(PlainHttpConnection.java:183)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:569)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:185)
+	... 9 common frames omitted

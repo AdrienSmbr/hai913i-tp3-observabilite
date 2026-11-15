@@ -1,0 +1,13 @@
+source : journaux/locations.log (17 enregistrements)
+
+station de depart   ouvertes  cloturees  montant facture   ouvertures refusees
+ST-AILLEURS                0          0           0.00 EUR             1
+ST-ARCEAUX                 1          1           1.05 EUR             0
+ST-COMEDIE                 2          2           2.10 EUR             2
+ST-GARE                    0          0           0.00 EUR             1
+ST-MOSSON                  1          1           1.05 EUR             0
+ST-PEYROU                  0          0           0.00 EUR             2
+ST-TRIOLET                 1          1           1.05 EUR             0
+
+total : 5 location(s) ouverte(s), 5 cloturee(s), 5.25 EUR factures, 6 ouverture(s) refusee(s)
+domaines d abonnes vus : etu.umontpellier.fr

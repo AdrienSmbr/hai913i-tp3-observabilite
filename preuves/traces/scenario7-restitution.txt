@@ -1,0 +1,40 @@
+
+trace e9ff6df2f897c79f1b1a4791d3b0bb52   34 span(s)
+--------------------------------------------------------------------------------------------
+POST /locations/{reference}/restitution         121.4 ms  100 %  ####################  locations
+  location.restituer                            114.8 ms   95 %  ###################.  locations
+    LocationJpa.findById                          1.3 ms    1 %  #...................  locations
+      Session.find hai913i.tp3.locations.dep      0.7 ms    1 %  #...................  locations
+        SELECT locations.location                 0.1 ms    0 %  #...................  locations
+      Transaction.commit                          0.1 ms    0 %  #...................  locations
+    POST                                         93.1 ms   77 %  ###############.....  locations
+      POST /stations/{code}/depot                89.1 ms   73 %  ###############.....  parc
+        StationJpa.findById                       1.2 ms    1 %  #...................  parc
+          Session.find hai913i.tp3.parc.depo      0.7 ms    1 %  #...................  parc
+            SELECT parc.station                   0.2 ms    0 %  #...................  parc
+          Transaction.commit                      0.1 ms    0 %  #...................  parc
+        VeloJpa.findById                          0.6 ms    0 %  #...................  parc
+          Session.find hai913i.tp3.parc.depo      0.3 ms    0 %  #...................  parc
+            SELECT parc.velo                      0.1 ms    0 %  #...................  parc
+          Transaction.commit                      0.1 ms    0 %  #...................  parc
+        VeloJpa.countByCodeStation                4.2 ms    3 %  #...................  parc
+          SELECT hai913i.tp3.parc.depot.jpa.      1.8 ms    1 %  #...................  parc
+            SELECT parc.velo                      0.2 ms    0 %  #...................  parc
+        VeloJpa.findById                          0.5 ms    0 %  #...................  parc
+          Session.find hai913i.tp3.parc.depo      0.4 ms    0 %  #...................  parc
+            SELECT parc.velo                      0.1 ms    0 %  #...................  parc
+        Transaction.commit                        1.0 ms    1 %  #...................  parc
+          UPDATE parc.velo                        0.3 ms    0 %  #...................  parc
+        VeloJpa.countByCodeStationAndEtat         1.3 ms    1 %  #...................  parc
+          SELECT hai913i.tp3.parc.depot.jpa.      0.8 ms    1 %  #...................  parc
+            SELECT parc.velo                      0.1 ms    0 %  #...................  parc
+    LocationJpa.findById                          1.2 ms    1 %  #...................  locations
+      Session.find hai913i.tp3.locations.dep      0.7 ms    1 %  #...................  locations
+        SELECT locations.location                 0.1 ms    0 %  #...................  locations
+    LocationJpa.save                              0.2 ms    0 %  #...................  locations
+      Session.merge hai913i.tp3.locations.de      0.1 ms    0 %  #...................  locations
+    Transaction.commit                            9.7 ms    8 %  ##..................  locations
+      UPDATE locations.location                   0.8 ms    1 %  #...................  locations
+--------------------------------------------------------------------------------------------
+services traverses : parc, locations
+tracers : io.opentelemetry.jdbc | io.opentelemetry.tomcat-10.0 | io.opentelemetry.hibernate-6.0 | io.opentelemetry.spring-data-1.8 | hai913i.tp3.locations | io.opentelemetry.java-http-client

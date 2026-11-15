@@ -1,0 +1,15 @@
+=== 1. fichiers de journal sous « ../preuves/journaux » ===
+  ../preuves/journaux/frontend-console.log secret=0  fragment=0  champ=0  adresse=0  domaine_seul=0
+  ../preuves/journaux/locations-console.log secret=0  fragment=0  champ=0  adresse=0  domaine_seul=5
+  ../preuves/journaux/locations.log        secret=0  fragment=0  champ=0  adresse=0  domaine_seul=5
+  ../preuves/journaux/parc-console.log     secret=0  fragment=0  champ=0  adresse=0  domaine_seul=0
+  ../preuves/journaux/parc.log             secret=0  fragment=0  champ=0  adresse=0  domaine_seul=0
+
+=== 2. spans stockés par Jaeger ===
+  service « parc »                         secret=0  fragment=0  champ=0  adresse=0  domaine_seul=13
+  service « locations »                    secret=0  fragment=0  champ=0  adresse=0  domaine_seul=14
+  service « velos-frontend »               secret=0  fragment=0  champ=0  adresse=0  domaine_seul=2
+
+OK : 8 source(s) inspectée(s). Aucun mot de passe, même
+     tronqué, aucun nom de champ interdit, aucune adresse complète.
+     Seul le domaine subsiste, ce qui était l'intention.

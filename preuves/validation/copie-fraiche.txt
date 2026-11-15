@@ -1,0 +1,8 @@
+telechargement de l agent 2.32.0 ...
+agent 2.32.0 telecharge (25.2 Mo) : <copie fraiche>/velos-tp3/opentelemetry-javaagent.jar
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+ Test Files  3 passed (3)
+      Tests  19 passed (19)
