@@ -2,6 +2,8 @@ package hai913i.tp3.parc.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,14 @@ import hai913i.tp3.parc.domaine.Velo;
  * <p>Cette classe ignore qu'il existe un protocole HTTP.
  * Elle rend des objets du métier ou lève une faute du métier.
  * C'est la couche API qui décide du code de statut.</p>
+ *
+ * <p><b>TP3.</b> Un seul journal, dans cette couche : le refus d'un retrait
+ * et son motif (Q2). Le contrôleur et le dépôt ne journalisent rien.</p>
  */
 @Service
 public class ServiceParc {
+
+    private static final Logger log = LoggerFactory.getLogger(ServiceParc.class);
 
     private final ParcDepot depot;
     private final int consolidationMs;
@@ -43,21 +50,45 @@ public class ServiceParc {
     /**
      * Retire un vélo d'une station.
      *
+     * <p>TP3 : la ligne WARN dit POURQUOI le parc a refusé, ce que le code
+     * 409 ou 503 seul ne dit pas.</p>
+     *
      * @return le vélo retiré
      * @throws StationIntrouvable  le code ne correspond à aucune station
      * @throws StationIndisponible la station est hors service
      * @throws MouvementImpossible la station n'a plus aucun vélo disponible
      */
     public Velo retirer(String code) {
-        Station station = station(code);
-        if (station.horsService()) {
-            throw new StationIndisponible(code);
+        try {
+            Station station = station(code);
+            if (station.horsService()) {
+                throw new StationIndisponible(code);
+            }
+            Velo velo = depot.premierDisponible(code)
+                    .orElseThrow(() -> new MouvementImpossible(
+                            "aucun vélo disponible à la station " + code));
+            depot.retirer(velo.identifiant());
+            return new Velo(velo.identifiant(), null, EtatVelo.EN_COURSE);
+        } catch (StationIntrouvable | StationIndisponible | MouvementImpossible refus) {
+            //  Un refus du métier : le parc fonctionne et répond. WARN, sans
+            //  pile, avec un motif à trois valeurs possibles.
+            log.atWarn()
+               .setMessage("parc.retrait_refuse")
+               .addKeyValue("station.code", code)
+               .addKeyValue("refus.motif", motif(refus))
+               .log();
+            throw refus;
         }
-        Velo velo = depot.premierDisponible(code)
-                .orElseThrow(() -> new MouvementImpossible(
-                        "aucun vélo disponible à la station " + code));
-        depot.retirer(velo.identifiant());
-        return new Velo(velo.identifiant(), null, EtatVelo.EN_COURSE);
+    }
+
+    private static String motif(RuntimeException refus) {
+        if (refus instanceof StationIntrouvable) {
+            return "station_inconnue";
+        }
+        if (refus instanceof StationIndisponible) {
+            return "station_hors_service";
+        }
+        return "aucun_velo_disponible";
     }
 
     /**
