@@ -29,3 +29,7 @@ Thumbs.db
 # Journaux et captures locales
 *.log
 captures/
+
+# TP3 : journaux produits à l'exécution (les preuves conservées vivent dans
+# ../preuves/, hors du code source).
+journaux/
