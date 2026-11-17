@@ -1,6 +1,6 @@
 # TP3, infrastructure d'observabilité de velos-tp3.
 #
-# Seuls le Collector et Jaeger sont conteneurisés. Les deux services Java et
+# Seuls le Collector, Jaeger et (bonus D4) Prometheus sont conteneurisés. Les deux services Java et
 # l'interface web se lancent localement : on veut voir l'agent s'attacher à
 # une JVM que l'on démarre soi-même, et pouvoir relancer l'application sans
 # toucher à l'infrastructure.
@@ -23,6 +23,10 @@ services:
     ports:
       - "4317:4317"   # OTLP/gRPC : les agents Java de parc et de locations
       - "4318:4318"   # OTLP/HTTP : le navigateur (avec CORS)
+    # Le port 8889 (métriques au format Prometheus) n'est PAS publié : seul
+    # Prometheus le lit, sur le réseau de Compose.
+    expose:
+      - "8889"
     depends_on:
       - jaeger
 
@@ -35,3 +39,15 @@ services:
     # parle directement, tout passe par le Collector.
     expose:
       - "4317"
+
+  # Bonus D4 : Prometheus vient lire les métriques du Collector toutes les
+  # 10 s. Son interface (et son API de requête) est publiée sur 9090.
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    container_name: velos-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - collector

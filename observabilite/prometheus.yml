@@ -1,0 +1,9 @@
+# Bonus D4 : une seule cible, le Collector. Prometheus ne connaît ni les
+# services ni les agents : la topologie reste « tout passe par le Collector ».
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: collector
+    static_configs:
+      - targets: ["collector:8889"]

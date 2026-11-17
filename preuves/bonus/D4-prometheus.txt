@@ -1,0 +1,70 @@
+# Bonus D4 : les mêmes compteurs, interrogés dans Prometheus (prom/prometheus:v3.15.1, http://localhost:9090/api/v1/query)
+# Prometheus lit collector:8889 toutes les 10 s (observabilite/prometheus.yml)
+
+$ PromQL : up{job="collector"}
+   {'__name__': 'up', 'instance': 'collector:8889', 'job': 'collector'} => 1
+
+$ PromQL : sum by (station_depart) (velos_locations_ouvertes_total)
+   {'station_depart': 'ST-ARCEAUX'} => 6
+   {'station_depart': 'ST-COMEDIE'} => 7
+   {'station_depart': 'ST-MOSSON'} => 6
+   {'station_depart': 'ST-TRIOLET'} => 6
+
+$ PromQL : sum by (station_depart) (velos_locations_montant_EUR_total)
+   {'station_depart': 'ST-ARCEAUX'} => 6.3
+   {'station_depart': 'ST-COMEDIE'} => 7.35
+   {'station_depart': 'ST-MOSSON'} => 6.3
+   {'station_depart': 'ST-TRIOLET'} => 6.3
+
+$ PromQL : sum by (operation, echec_etape, echec_cause) (velos_locations_echecs_total)
+   {'echec_cause': 'AbonneRefuse', 'echec_etape': 'verification_abonne', 'operation': 'ouvrir'} => 7
+   {'echec_cause': 'LocationDejaCloturee', 'echec_etape': 'recherche_location', 'operation': 'restituer'} => 7
+   {'echec_cause': 'MouvementRefuse', 'echec_etape': 'retrait_parc', 'operation': 'ouvrir'} => 7
+   {'echec_cause': 'ParcIndisponible', 'echec_etape': 'retrait_parc', 'operation': 'ouvrir'} => 7
+   {'echec_cause': 'StationInconnue', 'echec_etape': 'retrait_parc', 'operation': 'ouvrir'} => 7
+
+$ PromQL : sum(velos_locations_echecs_total{operation="ouvrir"}) / (sum(velos_locations_echecs_total{operation="ouvrir"}) + sum(velos_locations_ouvertes_total))
+   {} => 0.5283018867924528
+
+$ PromQL : count by (__name__) ({exported_job=~"locations|parc"})
+   {'__name__': 'target_info'} => 1
+   {'__name__': 'velos_locations_echecs_total'} => 5
+   {'__name__': 'velos_locations_montant_EUR_total'} => 4
+   {'__name__': 'velos_locations_ouvertes_total'} => 4
+
+$ PromQL (dans le temps) : sum by (exported_instance) (velos_locations_ouvertes_total), pas de 60 s sur les 9 dernières minutes
+  (plusieurs instances : chaque redémarrage du service donne un nouveau service.instance.id, donc de nouvelles séries ; l'ancienne s'arrête)
+   instance 0f8931c0
+      19:35:22 8
+      19:36:22 12
+      19:37:22 16
+      19:38:22 18
+      19:39:22 18
+      19:40:22 18
+      19:41:22 18
+      19:42:22 18
+      19:43:22 18
+   instance 97953631
+      19:35:22 15
+      19:36:22 15
+      19:37:22 15
+      19:38:22 15
+   instance ddfbe2f5
+      19:39:22 5
+      19:40:22 9
+      19:41:22 13
+      19:42:22 21
+      19:43:22 25
+      19:44:22 25
+
+$ PromQL : sum(increase(velos_locations_ouvertes_total[2m]))   (indépendant des redémarrages : increase gère la remise à zéro)
+      19:35:22 4.8
+      19:36:22 8.7
+      19:37:22 8.7
+      19:38:22 6.5
+      19:39:22 2.2
+      19:40:22 4.5
+      19:41:22 8.7
+      19:42:22 13.1
+      19:43:22 8.7
+      19:44:22 4.4

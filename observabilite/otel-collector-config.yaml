@@ -1,8 +1,8 @@
 # TP3, OpenTelemetry Collector de velos-tp3.
 #
 # Recevoir, traiter, exporter. Trois sources (deux agents Java, un navigateur),
-# un backend (Jaeger) pour les traces. Les métriques du bonus D3 ne vont pour
-# l'instant que dans l'exportateur debug. Rien ne parle à Jaeger sans passer par ici.
+# deux backends : Jaeger pour les traces, Prometheus pour les métriques
+# (bonus D3, D4). Rien ne parle à un backend sans passer par ici.
 
 receivers:
   otlp:
@@ -70,6 +70,12 @@ exporters:
   debug:
     verbosity: basic
 
+  # Bonus D4 : les métriques exposées au format Prometheus, sur le port 8889
+  # du conteneur, où Prometheus vient les chercher (modèle « pull »). Le
+  # Collector ne pousse rien vers Prometheus : il sert une page de métriques.
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
 service:
   pipelines:
     traces:
@@ -79,7 +85,7 @@ service:
     metrics:
       receivers: [otlp]
       processors: [resource/minimiser, filter/metier, batch]
-      exporters: [debug]
+      exporters: [prometheus, debug]
   telemetry:
     logs:
       level: info

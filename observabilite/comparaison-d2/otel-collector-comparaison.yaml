@@ -1,5 +1,5 @@
 # Bonus D2, configuration de PREUVE uniquement (jamais en exploitation).
-# resource/minimiser y est recopié de ../otel-collector-config.yaml :
+# resource/minimiser et filter/metier y sont recopiés de ../otel-collector-config.yaml :
 # toute modification de l'un doit être reportée dans l'autre.
 #
 # Les mêmes lots de spans passent par deux pipelines : « brut » les écrit tels
@@ -29,6 +29,14 @@ processors:
         action: delete
       - key: host.name
         action: hash
+  # Copie de la configuration normale, pour que les métriques de l'agent
+  # trouvent aussi un pipeline en mode preuve (elles ne servent pas à D2).
+  filter/metier:
+    error_mode: ignore
+    metrics:
+      metric:
+        - 'not IsMatch(name, "^velos\\.")'
+
 exporters:
   otlp_grpc/jaeger:
     endpoint: jaeger:4317
@@ -38,6 +46,9 @@ exporters:
     path: /sortie/avant.json
   file/apres:
     path: /sortie/apres.json
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
 service:
   pipelines:
     traces/brut:
@@ -48,3 +59,7 @@ service:
       receivers: [otlp]
       processors: [resource/minimiser, batch]
       exporters: [otlp_grpc/jaeger, file/apres]
+    metrics:
+      receivers: [otlp]
+      processors: [resource/minimiser, filter/metier, batch]
+      exporters: [prometheus]

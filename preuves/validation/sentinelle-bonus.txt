@@ -1,0 +1,13 @@
+=== 1. fichiers de journal sous « journaux » ===
+  journaux/locations-console.txt           secret=0  fragment=0  champ=0  adresse=0  domaine_seul=5
+  journaux/locations.log                   secret=0  fragment=0  champ=0  adresse=0  domaine_seul=25
+  journaux/parc-console.txt                secret=0  fragment=0  champ=0  adresse=0  domaine_seul=0
+  journaux/parc.log                        secret=0  fragment=0  champ=0  adresse=0  domaine_seul=0
+
+=== 2. spans stockés par Jaeger ===
+  service « parc »                         secret=0  fragment=0  champ=0  adresse=0  domaine_seul=38
+  service « locations »                    secret=0  fragment=0  champ=0  adresse=0  domaine_seul=41
+
+OK : 6 source(s) inspectée(s). Aucun mot de passe, même
+     tronqué, aucun nom de champ interdit, aucune adresse complète.
+     Seul le domaine subsiste, ce qui était l'intention.

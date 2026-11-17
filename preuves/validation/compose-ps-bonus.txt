@@ -1,0 +1,6 @@
+# Infrastructure après les bonus D2 à D4 (2026-11-17 19:54)
+$ docker compose -f observabilite/docker-compose.yml ps --format "table {{.Name}}	{{.Image}}	{{.Status}}	{{.Ports}}"
+NAME               IMAGE                                  STATUS          PORTS
+velos-collector    otel/opentelemetry-collector:0.162.0   Up 20 minutes   0.0.0.0:4317-4318->4317-4318/tcp, [::]:4317-4318->4317-4318/tcp
+velos-jaeger       jaegertracing/jaeger:2.22.0            Up 20 minutes   0.0.0.0:16686->16686/tcp, [::]:16686->16686/tcp
+velos-prometheus   prom/prometheus:v3.15.1                Up 20 minutes   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp
