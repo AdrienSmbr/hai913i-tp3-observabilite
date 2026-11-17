@@ -17,10 +17,12 @@
  *       `locations`), c'est ce nom que Jaeger affiche ;</li>
  *   <li>`otel.exporter.otlp.endpoint` : le Collector, en gRPC, et jamais
  *       Jaeger directement ;</li>
- *   <li>`otel.metrics.exporter=none` et `otel.logs.exporter=none` : seules
- *       les TRACES partent vers le Collector. Les journaux restent dans des
- *       fichiers (Jaeger n'est pas un visualiseur de journaux), et aucune des
- *       trois questions ne demande de métrique.</li>
+ *   <li>`otel.logs.exporter=none` : les journaux restent dans des fichiers
+ *       (Jaeger n'est pas un visualiseur de journaux).</li>
+ *   <li>bonus D3, `otel.metrics.exporter=otlp` toutes les 10 s
+ *       (`otel.metric.export.interval`) : les compteurs du métier des
+ *       locations partent vers le Collector, qui ne garde qu'eux (filtre
+ *       `filter/metier`) et les expose à Prometheus (bonus D4).</li>
  * </ul>
  */
 import { spawn } from 'node:child_process';
@@ -49,7 +51,8 @@ const argumentsAgent = [
   `-Dotel.service.name=${nom}`,
   `-Dotel.exporter.otlp.endpoint=${collecteur}`,
   '-Dotel.exporter.otlp.protocol=grpc',
-  '-Dotel.metrics.exporter=none',
+  '-Dotel.metrics.exporter=otlp',
+  '-Dotel.metric.export.interval=10000',
   '-Dotel.logs.exporter=none',
 ];
 

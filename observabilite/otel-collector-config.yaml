@@ -1,7 +1,8 @@
 # TP3, OpenTelemetry Collector de velos-tp3.
 #
 # Recevoir, traiter, exporter. Trois sources (deux agents Java, un navigateur),
-# un seul backend (Jaeger). Rien ne parle à Jaeger sans passer par ici.
+# un backend (Jaeger) pour les traces. Les métriques du bonus D3 ne vont pour
+# l'instant que dans l'exportateur debug. Rien ne parle à Jaeger sans passer par ici.
 
 receivers:
   otlp:
@@ -46,6 +47,16 @@ processors:
       - key: host.name
         action: hash
 
+  # Bonus D3 : seules nos métriques du métier (velos.*) passent. L'agent
+  # exporte aussi les siennes (JVM, http.server.request.duration...) : elles
+  # répondent à d'autres questions que les nôtres, et c'est ici, en un seul
+  # endroit, qu'on décide de ce qui part vers le stockage des métriques.
+  filter/metier:
+    error_mode: ignore
+    metrics:
+      metric:
+        - 'not IsMatch(name, "^velos\\.")'
+
 exporters:
   # Vers Jaeger, en OTLP natif. « otlp_grpc » est le nom actuel du type.
   # « otlp » seul est un alias déprécié.
@@ -65,6 +76,10 @@ service:
       receivers: [otlp]
       processors: [resource/minimiser, batch]
       exporters: [otlp_grpc/jaeger, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [resource/minimiser, filter/metier, batch]
+      exporters: [debug]
   telemetry:
     logs:
       level: info

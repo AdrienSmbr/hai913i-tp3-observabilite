@@ -25,6 +25,10 @@ import hai913i.tp3.locations.parc.MouvementRefuse;
 import hai913i.tp3.locations.parc.ParcDistant;
 import hai913i.tp3.locations.parc.StationDistante;
 import io.opentelemetry.api.trace.StatusCode;
+import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+import io.opentelemetry.sdk.metrics.data.MetricData;
+import io.opentelemetry.sdk.metrics.data.PointData;
+import io.opentelemetry.sdk.testing.exporter.InMemoryMetricReader;
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.data.SpanData;
@@ -47,6 +51,10 @@ class ServiceLocationsTelemetrieTest {
     private final InMemorySpanExporter exportateur = InMemorySpanExporter.create();
     private final SdkTracerProvider fournisseur = SdkTracerProvider.builder()
             .addSpanProcessor(SimpleSpanProcessor.create(exportateur))
+            .build();
+    private final InMemoryMetricReader lecteur = InMemoryMetricReader.create();
+    private final SdkMeterProvider compteurs = SdkMeterProvider.builder()
+            .registerMetricReader(lecteur)
             .build();
 
     /** Registre minimal. */
@@ -117,12 +125,19 @@ class ServiceLocationsTelemetrieTest {
     private ServiceLocations service() {
         Clock horloge = Clock.fixed(Instant.parse("2026-11-04T09:00:00Z"), ZoneOffset.UTC);
         return new ServiceLocations(new Depot(), new Parc(), new Abonnes(), horloge,
-                                    fournisseur.get("test"));
+                                    fournisseur.get("test"),
+                                    new MesuresLocations(compteurs.get("test")));
     }
 
     @AfterEach
     void fermer() {
         fournisseur.close();
+        compteurs.close();
+    }
+
+    private MetricData metrique(String nom) {
+        return lecteur.collectAllMetrics().stream()
+                .filter(m -> m.getName().equals(nom)).findFirst().orElseThrow();
     }
 
     private SpanData seul(String nom) {
@@ -182,5 +197,62 @@ class ServiceLocationsTelemetrieTest {
         assertThat(span.getAttributes().asMap().toString())
                 .contains("location.montant_eur=1.05", "station.arrivee=ST-ARCEAUX");
         assertThat(span.getEvents()).anyMatch(e -> e.getName().equals("location.facturee"));
+    }
+
+    @Test
+    void les_compteurs_du_metier_comptent_par_station_et_par_etape() {
+        ServiceLocations service = service();
+        service.ouvrir("ST-COMEDIE", COURRIEL, MOT_DE_PASSE);
+        service.restituer("L-0001", "ST-ARCEAUX");
+        assertThatThrownBy(() -> service.ouvrir("ST-GARE", COURRIEL, MOT_DE_PASSE));
+        assertThatThrownBy(() -> service.ouvrir("ST-COMEDIE", COURRIEL, "faux"));
+        assertThatThrownBy(() -> service.restituer("L-0001", "ST-ARCEAUX"));
+
+        var ouvertes = metrique("velos.locations.ouvertes").getLongSumData().getPoints();
+        assertThat(ouvertes).singleElement().satisfies(p -> {
+            assertThat(p.getValue()).isEqualTo(1);
+            assertThat(p.getAttributes().get(MesuresLocations.STATION)).isEqualTo("ST-COMEDIE");
+        });
+        var montant = metrique("velos.locations.montant").getDoubleSumData().getPoints();
+        assertThat(montant).singleElement()
+                .satisfies(p -> assertThat(p.getValue()).isEqualTo(1.05));
+
+        var echecs = metrique("velos.locations.echecs").getLongSumData().getPoints().stream()
+                .map(p -> p.getAttributes().get(MesuresLocations.OPERATION) + "/"
+                          + p.getAttributes().get(MesuresLocations.ETAPE) + "/"
+                          + p.getAttributes().get(MesuresLocations.CAUSE) + "=" + p.getValue())
+                .toList();
+        assertThat(echecs).containsExactlyInAnyOrder(
+                "ouvrir/retrait_parc/MouvementRefuse=1",
+                "ouvrir/verification_abonne/AbonneRefuse=1",
+                "restituer/recherche_location/LocationDejaCloturee=1");
+    }
+
+    @Test
+    void aucune_metrique_ne_porte_d_identifiant_ni_de_donnee_personnelle() {
+        ServiceLocations service = service();
+        service.ouvrir("ST-COMEDIE", COURRIEL, MOT_DE_PASSE);
+        service.restituer("L-0001", "ST-ARCEAUX");
+        assertThatThrownBy(() -> service.ouvrir("ST-INCONNUE", COURRIEL, "faux"));
+
+        var cles = lecteur.collectAllMetrics().stream()
+                .flatMap(m -> m.getData().getPoints().stream())
+                .map(PointData::getAttributes)
+                .flatMap(a -> a.asMap().keySet().stream())
+                .map(k -> k.getKey())
+                .distinct().toList();
+        assertThat(cles).containsOnly("station.depart", "operation", "echec.etape", "echec.cause");
+        assertThat(lecteur.collectAllMetrics().toString())
+                .doesNotContain("L-0001", "V-0006", "umontpellier", COURRIEL, "ST-INCONNUE");
+    }
+
+    @Test
+    void une_cause_imprevue_est_repliee_sur_autre() {
+        MesuresLocations mesures = new MesuresLocations(compteurs.get("test"));
+        mesures.echec("ouvrir", "enregistrement", "IllegalStateException");
+
+        var causes = metrique("velos.locations.echecs").getLongSumData().getPoints().stream()
+                .map(p -> p.getAttributes().get(MesuresLocations.CAUSE)).toList();
+        assertThat(causes).containsExactly("Autre");
     }
 }

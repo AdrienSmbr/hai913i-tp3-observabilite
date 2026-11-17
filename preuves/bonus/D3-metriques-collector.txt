@@ -1,0 +1,28 @@
+# Bonus D3 : les compteurs du métier, tels que le Collector les expose (page :8889, lue depuis le réseau de Compose)
+# Trafic : services neufs, verifier-fonctionnel.mjs une fois, puis 6 tours de scenarios.mjs + scenarios-supplementaires.mjs espacés de 50 s
+$ docker exec velos-prometheus wget -qO- http://collector:8889/metrics | grep velos_
+# HELP velos_locations_echecs_total Ouvertures et restitutions échouées, par étape et par cause
+# TYPE velos_locations_echecs_total counter
+velos_locations_echecs_total{echec_cause="AbonneRefuse",echec_etape="verification_abonne",instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",operation="ouvrir",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version=""} 7
+velos_locations_echecs_total{echec_cause="LocationDejaCloturee",echec_etape="recherche_location",instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",operation="restituer",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version=""} 7
+velos_locations_echecs_total{echec_cause="MouvementRefuse",echec_etape="retrait_parc",instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",operation="ouvrir",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version=""} 7
+velos_locations_echecs_total{echec_cause="ParcIndisponible",echec_etape="retrait_parc",instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",operation="ouvrir",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version=""} 7
+velos_locations_echecs_total{echec_cause="StationInconnue",echec_etape="retrait_parc",instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",operation="ouvrir",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version=""} 7
+# HELP velos_locations_montant_EUR_total Montant facturé à la restitution, par station de départ
+# TYPE velos_locations_montant_EUR_total counter
+velos_locations_montant_EUR_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-ARCEAUX"} 6.3
+velos_locations_montant_EUR_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-COMEDIE"} 7.35
+velos_locations_montant_EUR_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-MOSSON"} 6.3
+velos_locations_montant_EUR_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-TRIOLET"} 6.3
+# HELP velos_locations_ouvertes_total Locations ouvertes, par station de départ
+# TYPE velos_locations_ouvertes_total counter
+velos_locations_ouvertes_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-ARCEAUX"} 6
+velos_locations_ouvertes_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-COMEDIE"} 7
+velos_locations_ouvertes_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-MOSSON"} 6
+velos_locations_ouvertes_total{instance="ddfbe2f5-b51a-4b22-aaa9-398095f08267",job="locations",otel_scope_name="hai913i.tp3.locations",otel_scope_schema_url="",otel_scope_version="",station_depart="ST-TRIOLET"} 6
+
+$ docker exec velos-prometheus wget -qO- http://collector:8889/metrics | grep -v '^#' | cut -d'{' -f1 | sort | uniq -c   (aucune métrique de l'agent : filter/metier)
+   1 target_info
+   5 velos_locations_echecs_total
+   4 velos_locations_montant_EUR_total
+   4 velos_locations_ouvertes_total

@@ -73,24 +73,33 @@ public class ServiceLocations {
     private final Abonnes abonnes;
     private final Clock horloge;
     private final Tracer tracer;
+    private final MesuresLocations mesures;
 
     /**
      * Constructeur d'origine, conservé pour les tests fournis qui assemblent le
-     * service sans Spring. Sans agent, le tracer obtenu est no-op.
+     * service sans Spring. Sans agent, le tracer et le meter obtenus sont no-op.
      */
     ServiceLocations(LocationDepot depot, ParcDistant parc, Abonnes abonnes, Clock horloge) {
         this(depot, parc, abonnes, horloge,
              GlobalOpenTelemetry.getTracer(ConfigurationTelemetrie.INSTRUMENTATION));
     }
 
-    @Autowired
+    /** Tests des spans : les métriques restent celles de l'API globale (no-op sans agent). */
     ServiceLocations(LocationDepot depot, ParcDistant parc, Abonnes abonnes, Clock horloge,
                      Tracer tracer) {
+        this(depot, parc, abonnes, horloge, tracer,
+             new MesuresLocations(GlobalOpenTelemetry.getMeter(ConfigurationTelemetrie.INSTRUMENTATION)));
+    }
+
+    @Autowired
+    ServiceLocations(LocationDepot depot, ParcDistant parc, Abonnes abonnes, Clock horloge,
+                     Tracer tracer, MesuresLocations mesures) {
         this.depot = depot;
         this.parc = parc;
         this.abonnes = abonnes;
         this.horloge = horloge;
         this.tracer = tracer;
+        this.mesures = mesures;
     }
 
     /** Les stations, telles que le parc les décrit. */
@@ -115,8 +124,9 @@ public class ServiceLocations {
      * <p>Le mot de passe sert à {@link Abonnes#verifier} et s'arrête là.
      * De l'adresse, seul le domaine est conservé.</p>
      *
-     * <p>TP3 : span explicite {@code location.ouvrir} (Q2, Q3) et événement de
-     * journal structuré {@code location.ouverte} (Q3). L'étape en cours est
+     * <p>TP3 : span explicite {@code location.ouvrir} (Q2, Q3), événement de
+     * journal structuré {@code location.ouverte} (Q3) et, bonus D3, compteur
+     * {@code velos.locations.ouvertes} (voir {@link MesuresLocations}). L'étape en cours est
      * tenue à jour pour qu'un échec dise <i>où</i> il s'est produit (Q2).</p>
      *
      * @throws AbonneRefuse l'abonné n'a pas été reconnu
@@ -151,10 +161,12 @@ public class ServiceLocations {
                    .addKeyValue(VELO, location.identifiantVelo())
                    .addKeyValue(ABONNE_DOMAINE, domaine)
                    .log();
+                mesures.ouverte(codeStation);
                 return location;
             } catch (RuntimeException faute) {
                 signalerEchec(span, "location.ouverture_echouee", etape, faute,
                               STATION_DEPART, codeStation);
+                mesures.echec("ouvrir", etape, faute.getClass().getSimpleName());
                 throw faute;
             }
         } finally {
@@ -211,10 +223,12 @@ public class ServiceLocations {
                    .addKeyValue(DUREE_MINUTES, duree)
                    .addKeyValue(MONTANT_EUR, montant)
                    .log();
+                mesures.facturee(location.codeDepart(), montant);
                 return close;
             } catch (RuntimeException faute) {
                 signalerEchec(span, "location.restitution_echouee", etape, faute,
                               LOCATION_REFERENCE, reference);
+                mesures.echec("restituer", etape, faute.getClass().getSimpleName());
                 throw faute;
             }
         } finally {

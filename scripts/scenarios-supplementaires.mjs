@@ -42,10 +42,13 @@ const SCENARIOS = [
     but: 'un echec 409 entierement LOCAL : la trace du 2e rendu n a aucun span parc',
     ou: 'locations.log location.restitution_echouee etape=recherche_location',
     joue: async () => {
+      // Rendu à la station de départ : le stock de Mosson ne baisse pas d'un
+      // passage à l'autre, et le scénario reste rejouable.
       const r = await ouvrir('ST-MOSSON');
       const ref = r.corps?.reference;
-      await restituer(ref, 'ST-TRIOLET');
-      return restituer(ref, 'ST-TRIOLET');
+      if (!ref) return r;
+      await restituer(ref, 'ST-MOSSON');
+      return restituer(ref, 'ST-MOSSON');
     },
   },
   {
@@ -53,10 +56,18 @@ const SCENARIOS = [
     but: 'deux ouvertures a deux autres stations et leurs clotures : de quoi compter',
     ou: 'locations.log location.ouverte / location.cloturee ; node scripts/bilan-q3.mjs',
     joue: async () => {
+      // Croisé (Arceaux -> Triolet, Triolet -> Arceaux) : le stock de chaque
+      // station est inchangé après le scénario, qui reste rejouable.
       const a = await ouvrir('ST-ARCEAUX');
       const b = await ouvrir('ST-TRIOLET');
-      await restituer(a.corps?.reference, 'ST-COMEDIE');
-      return restituer(b.corps?.reference, 'ST-COMEDIE');
+      if (!a.corps?.reference || !b.corps?.reference) {
+        // Une ouverture a échoué : on rend l'autre vélo là où il a été pris.
+        if (a.corps?.reference) await restituer(a.corps.reference, 'ST-ARCEAUX');
+        if (b.corps?.reference) await restituer(b.corps.reference, 'ST-TRIOLET');
+        return a.corps?.reference ? b : a;
+      }
+      await restituer(a.corps.reference, 'ST-TRIOLET');
+      return restituer(b.corps.reference, 'ST-ARCEAUX');
     },
   },
 ];
