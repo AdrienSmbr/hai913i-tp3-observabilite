@@ -34,5 +34,6 @@ captures/
 # ../preuves/, hors du code source).
 journaux/
 
-# Compte-rendu et README en PDF : hors du dépôt tant que le binôme ne les a pas relus.
-rapport/
+# Rapport : seul le compte-rendu en PDF est versionné (sources et README.pdf restent en local).
+rapport/*
+!rapport/Compte-Rendu.pdf
