@@ -33,3 +33,6 @@ captures/
 # TP3 : journaux produits à l'exécution (les preuves conservées vivent dans
 # ../preuves/, hors du code source).
 journaux/
+
+# Compte-rendu et README en PDF : hors du dépôt tant que le binôme ne les a pas relus.
+rapport/
