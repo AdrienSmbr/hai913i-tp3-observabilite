@@ -21,10 +21,30 @@ receivers:
           max_age: 7200
 
 processors:
-  # Un seul traitement : regrouper les spans en lots avant l'export. On
-  # n'ajoute pas de processeur sans raison.
+  # Regrouper les spans en lots avant l'export.
   batch:
     timeout: 1s
+
+  # Bonus D2 : minimiser la ressource avant qu'elle ne quitte le Collector.
+  # L'agent Java décrit son processus par la ligne de commande complète et le
+  # chemin de l'exécutable : des chemins absolus de la machine (le dossier
+  # personnel, donc le nom du compte, quand on lance depuis son répertoire) et
+  # tous les arguments de la JVM. Ces deux attributs sont recopiés sur CHAQUE
+  # lot de spans et ne servent à aucune des trois questions : on les retire.
+  # host.name est le nom de la machine (« macbook-pro-de-<prénom> » sur un
+  # Mac) : on le remplace par son empreinte SHA-256, qui reste stable et
+  # distingue encore deux machines sans les nommer. On garde ce qui identifie
+  # l'exécution (service.name, service.instance.id, process.pid,
+  # process.runtime.*, telemetry.distro.version).
+  # Comparaison avant / après : observabilite/comparaison-d2/.
+  resource/minimiser:
+    attributes:
+      - key: process.command_args
+        action: delete
+      - key: process.executable.path
+        action: delete
+      - key: host.name
+        action: hash
 
 exporters:
   # Vers Jaeger, en OTLP natif. « otlp_grpc » est le nom actuel du type.
@@ -43,7 +63,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
+      processors: [resource/minimiser, batch]
       exporters: [otlp_grpc/jaeger, debug]
   telemetry:
     logs:

@@ -1,0 +1,50 @@
+# Bonus D2, configuration de PREUVE uniquement (jamais en exploitation).
+# resource/minimiser y est recopié de ../otel-collector-config.yaml :
+# toute modification de l'un doit être reportée dans l'autre.
+#
+# Les mêmes lots de spans passent par deux pipelines : « brut » les écrit tels
+# que reçus, « minimise » les écrit après resource/minimiser, puis les envoie à
+# Jaeger comme la configuration normale. Une même trace se lit donc avant et
+# après le traitement, dans sortie/avant.json et sortie/apres.json.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - http://localhost:4200
+          max_age: 7200
+
+processors:
+  batch:
+    timeout: 1s
+  resource/minimiser:
+    attributes:
+      - key: process.command_args
+        action: delete
+      - key: process.executable.path
+        action: delete
+      - key: host.name
+        action: hash
+exporters:
+  otlp_grpc/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  file/avant:
+    path: /sortie/avant.json
+  file/apres:
+    path: /sortie/apres.json
+service:
+  pipelines:
+    traces/brut:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [file/avant]
+    traces/minimise:
+      receivers: [otlp]
+      processors: [resource/minimiser, batch]
+      exporters: [otlp_grpc/jaeger, file/apres]

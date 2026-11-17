@@ -1,0 +1,27 @@
+# Bonus D2 : resource/minimiser, une même trace avant et après le Collector
+# 2026-11-17 19:27 | configuration de preuve : observabilite/comparaison-d2/ | trafic : node resources/scenarios.mjs
+$ node observabilite/comparaison-d2/comparer.mjs d8a835783037f55c46a83ebf2b04f42a
+trace d8a835783037f55c46a83ebf2b04f42a : 34 span(s) avant, 34 après
+
+service « locations » : 19 attributs de ressource avant, 17 après
+  ressource sérialisée : 2156 octets avant, 1231 après (-925)
+  modifié host.name : <nom du poste, 27 caractères>  ->  81125794417f9d24a204cd3d0f6d0f6d71f4a8a87decea43c77233ba82e843c4
+  retiré  process.command_args = [/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home/bin/java, -Dfile.encoding=UTF-8, -Dsun.stdout.encoding=UTF-8, -Dsun.stderr.encoding=U…
+          (contient un dossier personnel : /Users/<compte>/..., 548 caractères)
+  retiré  process.executable.path = /opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home/bin/java
+  gardé   host.arch, host.name, os.description, os.type, os.version, process.pid, process.runtime.description, process.runtime.name, process.runtime.version, service.instance.id, service.name, service.version, telemetry.distro.name, telemetry.distro.version, telemetry.sdk.language, telemetry.sdk.name, telemetry.sdk.version
+
+service « parc » : 19 attributs de ressource avant, 17 après
+  ressource sérialisée : 2136 octets avant, 1226 après (-910)
+  modifié host.name : <nom du poste, 27 caractères>  ->  81125794417f9d24a204cd3d0f6d0f6d71f4a8a87decea43c77233ba82e843c4
+  retiré  process.command_args = [/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home/bin/java, -Dfile.encoding=UTF-8, -Dsun.stdout.encoding=UTF-8, -Dsun.stderr.encoding=U…
+          (contient un dossier personnel : /Users/<compte>/..., 533 caractères)
+  retiré  process.executable.path = /opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home/bin/java
+  gardé   host.arch, host.name, os.description, os.type, os.version, process.pid, process.runtime.description, process.runtime.name, process.runtime.version, service.instance.id, service.name, service.version, telemetry.distro.name, telemetry.distro.version, telemetry.sdk.language, telemetry.sdk.name, telemetry.sdk.version
+
+lots contenant la trace : 145219 octets avant, 143384 après (-1835, 1.3 %)
+ensemble des lots      : 145219 octets avant, 143384 après (-1.3 %)
+
+$ curl -s http://localhost:16686/api/traces/d8a835783037f55c46a83ebf2b04f42a   (ressource vue par Jaeger, apres traitement)
+locations : host.name = 81125794417f9d24a204cd3d0f6d0f6d71f4a8a87decea43c77233ba82e843c4 | process.command_args present : False | process.executable.path present : False
+parc : host.name = 81125794417f9d24a204cd3d0f6d0f6d71f4a8a87decea43c77233ba82e843c4 | process.command_args present : False | process.executable.path present : False

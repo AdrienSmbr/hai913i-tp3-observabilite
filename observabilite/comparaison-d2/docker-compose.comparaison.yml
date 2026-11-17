@@ -1,0 +1,12 @@
+# Bonus D2 : surcharge de preuve. À lancer PAR-DESSUS le compose normal :
+#
+#   docker compose -f observabilite/docker-compose.yml \
+#                  -f observabilite/comparaison-d2/docker-compose.comparaison.yml up -d
+#
+# Le Collector lit alors la configuration à deux pipelines et écrit ses deux
+# fichiers dans observabilite/comparaison-d2/sortie/ (ignoré par Git).
+services:
+  collector:
+    volumes:
+      - ./comparaison-d2/otel-collector-comparaison.yaml:/etc/otel/config.yaml:ro
+      - ./comparaison-d2/sortie:/sortie
