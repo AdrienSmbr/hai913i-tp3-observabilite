@@ -7,6 +7,10 @@
 # fichiers dans observabilite/comparaison-d2/sortie/ (ignoré par Git).
 services:
   collector:
+    # Le dossier sortie/ n'existe pas dans une copie fraîche : Docker le crée
+    # au nom de root, et l'utilisateur non privilégié de l'image ne pourrait
+    # pas y écrire. Configuration de preuve uniquement.
+    user: "0:0"
     volumes:
       - ./comparaison-d2/otel-collector-comparaison.yaml:/etc/otel/config.yaml:ro
       - ./comparaison-d2/sortie:/sortie
