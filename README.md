@@ -18,15 +18,15 @@ Toutes les commandes se lancent depuis la racine `velos-tp3/`, sauf mention cont
 | `locations` | 8080 | `locations` | registre des locations, abonnés et facturation, seul point d'entrée du navigateur |
 | `parc` | 8081 | `parc` | stations et vélos, appelé uniquement par `locations` |
 
-L'infrastructure d'observabilité tourne dans Docker. Un OpenTelemetry Collector écoute sur 4317 (gRPC) et 4318 (HTTP), Jaeger sur 16686. Tout ce qui va à Jaeger passe par le Collector.
+L'infrastructure d'observabilité tourne dans Docker. Un OpenTelemetry Collector écoute sur 4317 (gRPC) et 4318 (HTTP), Jaeger sur 16686, et (bonus D4) Prometheus sur 9090. Tout ce qui va à Jaeger ou à Prometheus passe par le Collector.
 
 ```
 navigateur --HTTP + traceparent--> locations --HTTP + traceparent--> parc --JDBC--> H2
     |  OTLP/HTTP :4318                 |  OTLP/gRPC :4317                 |  OTLP/gRPC :4317
     +-------------------------> Collector <-----------------------------+
-                                    |  OTLP
-                                    v
-                              Jaeger :16686
+                                    |  OTLP (traces)        ^  lu toutes les 10 s (métriques, bonus D4)
+                                    v                       |
+                              Jaeger :16686         Prometheus :9090
 
 journaux : locations, parc -> journaux/<service>.log (JSON ECS) + console
            navigateur      -> console du navigateur
@@ -46,10 +46,11 @@ journaux : locations, parc -> journaux/<service>.log (JSON ECS) + console
 | `frontend/src/app/parc/parc-store.ts` | un span et une ligne de journal par geste de l'utilisateur |
 | `frontend/src/app/parc/parc-page.*` | affiche l'identifiant de trace du dernier geste |
 | `frontend/src/app/app.config.ts`, `core/configuration.ts` | démarrage de la télémétrie et adresse du Collector |
-| `observabilite/` | nouveau, contient `docker-compose.yml` et `otel-collector-config.yaml` |
+| `observabilite/` | nouveau, contient `docker-compose.yml` et `otel-collector-config.yaml`, plus `prometheus.yml` et `comparaison-d2/` pour les bonus |
+| `locations/.../service/MesuresLocations.java` | nouveau (bonus D3), les trois compteurs du métier |
 | `scripts/demarrer-observe.mjs` | nouveau, lance un service avec l'agent Java |
 | `scripts/scenarios-supplementaires.mjs`, `scripts/bilan-q3.mjs` | nouveaux, scénarios S8 à S11 et réponse à Q3 depuis le journal |
-| tests | `ServiceLocationsTelemetrieTest.java` (4 tests), `parc-store-telemetrie.spec.ts` (4 tests) |
+| tests | `ServiceLocationsTelemetrieTest.java` (4 tests, plus 3 pour le bonus D3), `parc-store-telemetrie.spec.ts` (4 tests) |
 
 Les contrôleurs, les règles métier, la facturation et les écrans se comportent comme avant.
 
@@ -59,7 +60,8 @@ Les contrôleurs, les règles métier, la facturation et les écrans se comporte
 * Le journal du navigateur reste dans la console du navigateur. Il n'est ni centralisé ni conservé, et les lignes citées dans le compte-rendu ont été recopiées depuis la console.
 * Jaeger garde les traces en mémoire. Elles disparaissent quand le conteneur s'arrête.
 * Le chargement initial du parc (`DonneesInitiales`, au démarrage) produit des traces sans requête HTTP. Elles ne servent à aucune question et on les ignore.
-* Aucune métrique n'est émise (bonus D3 et D4 non traités).
+* Les seules métriques sont les trois compteurs du bonus D3. Ils ne mesurent aucune durée : pour Q1, on lit les traces.
+* Prometheus garde ses séries en mémoire du conteneur, comme Jaeger ses traces.
 
 ## 2. Environnement
 
@@ -76,6 +78,7 @@ Versions utilisées pour produire les preuves du compte-rendu.
 | Agent Java OpenTelemetry | 2.32.0 |
 | OpenTelemetry Collector | 0.162.0 (`otel/opentelemetry-collector`) |
 | Jaeger | 2.22.0 (`jaegertracing/jaeger`) |
+| Prometheus (bonus D4) | 3.15.1 (`prom/prometheus`) |
 | OpenTelemetry Java | `opentelemetry-api` 1.66.0 (BOM), `opentelemetry-instrumentation-annotations` 2.32.0, `opentelemetry-sdk-testing` 1.66.0 (tests) |
 | OpenTelemetry JS | `@opentelemetry/api` 1.9.1, `sdk-trace-web` 2.12.0, `sdk-trace-base` 2.12.0, `resources` 2.12.0, `browser-instrumentation` 0.8.1 (expérimental), `exporter-trace-otlp-http` 0.223.0, `instrumentation` 0.223.0, `semantic-conventions` 1.43.0 |
 | Éditeur | pas d'IDE. Éditeur de texte et outils en ligne de commande (`mvn`, `java`, `npm`, `node`, `docker`), avec l'assistant Claude Code (voir la section IA du compte-rendu) |
@@ -119,8 +122,9 @@ Ouvrir ensuite http://localhost:4200 pour l'application et http://localhost:1668
 | 4317 | Collector, OTLP/gRPC (agents Java) |
 | 4318 | Collector, OTLP/HTTP (navigateur, CORS limité à `http://localhost:4200`) |
 | 16686 | Jaeger, interface et API |
+| 9090 | Prometheus, interface et API (bonus D4). Le port 8889 du Collector, qu'il lit, n'est pas publié |
 
-`demarrer-observe.mjs` lance le même JAR que `scripts/demarrer.mjs` en ajoutant `-javaagent:opentelemetry-javaagent.jar`, `-Dotel.service.name=<parc|locations>`, `-Dotel.exporter.otlp.endpoint=http://localhost:4317`, `-Dotel.exporter.otlp.protocol=grpc`, `-Dotel.metrics.exporter=none` et `-Dotel.logs.exporter=none`. Lancée sans agent (`node scripts/demarrer.mjs parc`), l'application fonctionne pareil et n'émet aucune trace.
+`demarrer-observe.mjs` lance le même JAR que `scripts/demarrer.mjs` en ajoutant `-javaagent:opentelemetry-javaagent.jar`, `-Dotel.service.name=<parc|locations>`, `-Dotel.exporter.otlp.endpoint=http://localhost:4317`, `-Dotel.exporter.otlp.protocol=grpc`, `-Dotel.metrics.exporter=otlp` avec `-Dotel.metric.export.interval=10000` (bonus D3) et `-Dotel.logs.exporter=none`. Lancée sans agent (`node scripts/demarrer.mjs parc`), l'application fonctionne pareil et n'émet aucune trace.
 
 Pour arrêter l'infrastructure : `docker compose -f observabilite/docker-compose.yml down`.
 
@@ -196,7 +200,7 @@ La ligne `location.ouverte` (ou `location.ouverture_echouee`) porte le `span_id`
 
 ```
 mvn -f parc/pom.xml test             # 9 tests
-mvn -f locations/pom.xml test        # 19 tests (15 fournis + 4 TP3)
+mvn -f locations/pom.xml test        # 22 tests (15 fournis + 4 TP3 + 3 bonus D3)
 cd frontend && npm test && cd ..     # 19 tests (15 fournis + 4 TP3)
 node resources/verifier-fonctionnel.mjs            # sur des services qu'on vient de démarrer : 21 contrôles
 node resources/verifier-confidentialite.mjs --journaux journaux   # journaux + spans Jaeger
@@ -225,6 +229,7 @@ node resources/verifier-confidentialite.mjs --journaux journaux   # journaux + s
 | Rien du tout dans Jaeger | Collector arrêté, ou agent non chargé | `docker compose -f observabilite/docker-compose.yml logs -f collector`, et chercher `opentelemetry-javaagent - version: 2.32.0` dans la sortie du service |
 | `trace_id=` vide dans les journaux | service lancé sans agent, ou ligne écrite hors requête | `node scripts/demarrer-observe.mjs` |
 | `agent absent` | agent pas téléchargé | `node resources/telecharger-agent.mjs` |
+| Aucune série `velos_` dans Prometheus | services lancés sans `demarrer-observe.mjs`, ou moins de 20 s depuis le dernier scénario (export toutes les 10 s, lecture toutes les 10 s) | relancer avec `demarrer-observe.mjs`, attendre, vérifier `up{job="collector"}` dans Prometheus |
 | `le port 8080 est deja occupe` | une ancienne JVM tourne encore | `lsof -i :8080` puis `kill <pid>` (sous Windows : `netstat -ano \| findstr :8080`, puis `taskkill /F /PID <pid>`) |
 | `verifier-fonctionnel.mjs` échoue après des scénarios | l'état du parc a changé | redémarrer les deux services (les bases sont en mémoire) |
 | Docker Desktop affiche « unable to start » | le disque de Docker est sur un support absent (disque externe) | rebrancher le disque, ou changer l'emplacement dans les réglages de Docker Desktop |
@@ -233,4 +238,38 @@ node resources/verifier-confidentialite.mjs --journaux journaux   # journaux + s
 
 ## 9. Bonus
 
-Non traités.
+D2, D3 et D4 sont traités, D1 (Spoon) ne l'est pas. Le détail et l'interprétation sont dans la section « D. Bonus traités » du compte-rendu, les preuves dans `preuves/bonus/`.
+
+### D2, minimiser la ressource dans le Collector
+
+Le processeur `resource/minimiser` (`observabilite/otel-collector-config.yaml`) retire `process.command_args` et `process.executable.path`, qui contiennent des chemins du poste et le nom du compte, et remplace `host.name` par son empreinte SHA-256. Il est actif dans la configuration normale.
+
+Rejouer la comparaison avant / après sur une même trace (configuration de preuve, à ne pas garder en exploitation) :
+
+```
+docker compose -f observabilite/docker-compose.yml -f observabilite/comparaison-d2/docker-compose.comparaison.yml up -d
+# démarrer parc et locations avec l'agent (§4), puis :
+node resources/scenarios.mjs
+node observabilite/comparaison-d2/comparer.mjs          # ou : comparer.mjs <trace_id>
+docker compose -f observabilite/docker-compose.yml up -d --force-recreate collector   # revenir à la configuration normale
+```
+
+### D3, trois compteurs du métier
+
+`velos.locations.ouvertes` et `velos.locations.montant` par `station.depart`, `velos.locations.echecs` par `operation`, `echec.etape` et `echec.cause` (6 fautes du métier, toute autre exception comptée comme `Autre`). Ils sont émis par `MesuresLocations`, exportés par l'agent toutes les 10 s, et le Collector ne laisse passer que les métriques `velos.*` (`filter/metier`). Pour les voir sans PromQL, directement sur la page du Collector (lue depuis le conteneur Prometheus, seul à atteindre le port 8889) :
+
+```
+docker exec velos-prometheus wget -qO- http://collector:8889/metrics | grep velos_
+```
+
+### D4, Prometheus
+
+Prometheus démarre avec le reste de l'infrastructure (§4) et lit le Collector toutes les 10 s. Après quelques scénarios, ouvrir `http://localhost:9090` et lancer par exemple :
+
+```
+sum by (station_depart) (velos_locations_ouvertes_total)
+sum by (operation, echec_etape, echec_cause) (velos_locations_echecs_total)
+sum(increase(velos_locations_ouvertes_total[2m]))
+```
+
+Après un redémarrage d'un service, les séries de l'instance précédente restent visibles 5 minutes (le Collector les garde jusqu'à expiration) : elles portent un autre `exported_instance`.
