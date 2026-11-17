@@ -1,6 +1,6 @@
 agent OpenTelemetry : service « locations » -> http://localhost:4317
 demarrage du service « locations » sur le port 8080 — Ctrl-C pour arreter
-arguments JVM supplementaires : -javaagent:/Users/florent/Projets/Loisir/Etudes/M2/Evolution/TP3/velos-tp3/opentelemetry-javaagent.jar -Dotel.service.name=locations -Dotel.exporter.otlp.endpoint=http://localhost:4317 -Dotel.exporter.otlp.protocol=grpc -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
+arguments JVM supplementaires : -javaagent:/Users/<compte>/Projets/Loisir/Etudes/M2/Evolution/TP3/velos-tp3/opentelemetry-javaagent.jar -Dotel.service.name=locations -Dotel.exporter.otlp.endpoint=http://localhost:4317 -Dotel.exporter.otlp.protocol=grpc -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
 [otel.javaagent 2026-11-10 11:01:59:160 +0100] [main] INFO io.opentelemetry.javaagent.tooling.VersionLogger - opentelemetry-javaagent - version: 2.32.0
 11:02:10.918 INFO  [ServiceLocations] location.ouverte location.reference="L-0001" station.depart="ST-COMEDIE" velo.identifiant="V-0006" abonne.domaine="etu.umontpellier.fr" {trace_id=745ea5edfbfb89ae75e2e629a25ad499 span_id=d6384710518638a9}
